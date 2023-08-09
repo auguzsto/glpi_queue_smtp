@@ -8,7 +8,7 @@ import (
 	"github.com/gofor-little/env"
 )
 
-func Send(to, subject, body string, queue *queues.Queue) {
+func Send(to, subject, body string, queue queues.Queue) {
 	SMTPFROM := env.Get("SMTPFROM", "DEFAULT_VALUE")
 	SMTPPASS := env.Get("SMTPPASS", "DEFAULT_VALUE")
 	SMTPADDRESS := env.Get("SMTPADDRESS", "DEFAULT_VALUE")
