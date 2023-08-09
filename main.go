@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"glpi_queue_smtp/modules/queues"
 	"glpi_queue_smtp/modules/smtp"
@@ -15,19 +16,22 @@ func main() {
 	}
 
 	fineshed := make(chan queues.Queue)
-	queues := queues.FindAll(12)
-	if len(queues) > 0 {
-		for _, queue := range queues {
+	getQueue := queues.FindAll(12)
+	start := time.Now()
+	if len(getQueue) > 0 {
+		for _, queue := range getQueue {
 			queue := queue
 			go func() {
-				smtp.Send(queue.To, queue.Name, queue.BodyHTML, &queue)
+				smtp.Send(queue.To, queue.Name, queue.BodyHTML, queue)
 				fineshed <- queue
 			}()
 		}
 
-		for range queues {
+		for range getQueue {
 			queue := <-fineshed
 			log.Println("Enviado: ", queue.ID, " | Name: ", queue.Name)
 		}
 	}
+	elapsed := time.Since(start)
+	queues.CreateCronTaskLogs(getQueue, elapsed)
 }

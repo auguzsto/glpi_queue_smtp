@@ -36,11 +36,11 @@ func FindAll(length int) []Queue {
 	return queues
 }
 
-func Fineshed(queue *Queue) {
+func Fineshed(queue Queue) {
 	db := database.Con()
 	sentTime := time.Now().Format(time.DateTime)
-	sentTry := queue.SentTry + 1
-	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ?, is_deleted = 1, sent_time = ? WHERE id = ?", sentTry, sentTime, &queue.ID)
+	queue.SentTry++
+	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ?, is_deleted = 1, sent_time = ? WHERE id = ?", queue.SentTry, sentTime, queue.ID)
 	defer db.Close()
 	if err != nil {
 		panic(err)
@@ -48,16 +48,40 @@ func Fineshed(queue *Queue) {
 
 }
 
-func IncrementSentTryCaseErrorSmtp(queue *Queue) {
+func IncrementSentTryCaseErrorSmtp(queue Queue) {
 	db := database.Con()
 	queue.SentTry++
-	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ? WHERE id = ?", queue.SentTry, &queue.ID)
+	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ? WHERE id = ?", queue.SentTry, queue.ID)
 	defer db.Close()
 	if err != nil {
 		panic(err)
 	}
 }
 
-func CreateCronTaskLogs(queue *Queue) {
-	// Code here
+func CreateCronTaskLogs(queues []Queue, elapsed time.Duration) {
+	currentTime := time.Now().Format(time.DateTime)
+	lastIdCronTasksLogs := getLastIdCronTaskLogs()
+	lastIdCronTasksLogs++
+	db := database.Con()
+	_, err := db.Exec("INSERT INTO glpi_crontasklogs (id, crontasks_id, crontasklogs_id, date, state, elapsed, volume, content) VALUES (?, 22, ?, ?, 2, ?, ?, 'Action completed, fully processed')", lastIdCronTasksLogs, lastIdCronTasksLogs, currentTime, elapsed.Seconds(), len(queues))
+	defer db.Close()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getLastIdCronTaskLogs() int64 {
+	db := database.Con()
+	var lastId int64
+	rows, err := db.Query("SELECT id FROM glpi_crontasklogs ORDER BY id DESC LIMIT 1")
+	defer db.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		rows.Scan(&lastId)
+	}
+
+	return lastId
 }
