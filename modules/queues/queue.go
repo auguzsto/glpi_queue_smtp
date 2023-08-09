@@ -41,6 +41,7 @@ func Fineshed(queue *Queue) {
 	sentTime := time.Now().Format(time.DateTime)
 	sentTry := queue.SentTry + 1
 	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ?, is_deleted = 1, sent_time = ? WHERE id = ?", sentTry, sentTime, &queue.ID)
+	defer db.Close()
 	if err != nil {
 		panic(err)
 	}
@@ -49,8 +50,9 @@ func Fineshed(queue *Queue) {
 
 func IncrementSentTryCaseErrorSmtp(queue *Queue) {
 	db := database.Con()
-	sentTry := queue.SentTry + 1
-	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ? WHERE id = ?", sentTry, &queue.ID)
+	queue.SentTry++
+	_, err := db.Exec("UPDATE glpi_queuednotifications SET sent_try = ? WHERE id = ?", queue.SentTry, &queue.ID)
+	defer db.Close()
 	if err != nil {
 		panic(err)
 	}

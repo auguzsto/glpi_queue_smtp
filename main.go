@@ -20,7 +20,7 @@ func main() {
 		for _, queue := range queues {
 			queue := queue
 			go func() {
-				smtp.Send(queue.From, queue.Name, queue.BodyHTML, &queue)
+				smtp.Send(queue.To, queue.Name, queue.BodyHTML, &queue)
 				fineshed <- queue
 			}()
 		}

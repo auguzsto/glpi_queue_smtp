@@ -3,7 +3,6 @@ package smtp
 import (
 	"glpi_queue_smtp/modules/queues"
 	"html"
-	"log"
 	"net/smtp"
 
 	"github.com/gofor-little/env"
@@ -25,8 +24,7 @@ func Send(to, subject, body string, queue *queues.Queue) {
 	err := smtp.SendMail(SMTPADDRESS, auth, SMTPFROM, []string{to}, []byte(msg))
 	if err != nil {
 		queues.IncrementSentTryCaseErrorSmtp(queue)
-		log.Printf("Smtp error: %s", err)
-		return
+		panic(err)
 	}
 
 	queues.Fineshed(queue)
