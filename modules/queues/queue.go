@@ -57,3 +57,7 @@ func IncrementSentTryCaseErrorSmtp(queue *Queue) {
 		panic(err)
 	}
 }
+
+func CreateCronTaskLogs(queue *Queue) {
+	// Code here
+}
