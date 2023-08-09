@@ -18,10 +18,10 @@ type Queue struct {
 	SentTry    int64
 }
 
-func FindAll(lenght int) []Queue {
+func FindAll(length int) []Queue {
 	db := database.Con()
 	var queues []Queue
-	rows, err := db.Query("SELECT id, NAME, items_id, sender, sendername, recipient, body_html, is_deleted, sent_time, sent_try FROM glpi_queuednotifications WHERE is_deleted = 0 LIMIT ?", lenght)
+	rows, err := db.Query("SELECT id, NAME, items_id, sender, sendername, recipient, body_html, is_deleted, sent_time, sent_try FROM glpi_queuednotifications WHERE is_deleted = 0 LIMIT ?", length)
 	defer db.Close()
 	if err != nil {
 		panic(err)

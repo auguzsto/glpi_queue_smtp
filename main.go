@@ -15,7 +15,7 @@ func main() {
 	}
 
 	fineshed := make(chan queues.Queue)
-	queues := queues.FindAll(1)
+	queues := queues.FindAll(12)
 	if len(queues) > 0 {
 		for _, queue := range queues {
 			queue := queue
