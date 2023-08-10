@@ -93,4 +93,6 @@ func HealthCronTaskLogs() {
 	if err != nil {
 		panic(err)
 	}
+
+	time.Sleep(time.Minute * 4320) // three days.
 }
