@@ -85,3 +85,14 @@ func getLastIdCronTaskLogs() int64 {
 
 	return lastId
 }
+
+func HealthCronTaskLogs() {
+	db := database.Con()
+	_, err := db.Exec("DELETE FROM glpi_crontasklogs WHERE crontasks_id = 22")
+	defer db.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	time.Sleep(time.Minute * 4320) // three days.
+}
